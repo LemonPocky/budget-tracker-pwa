@@ -78,5 +78,21 @@ function saveRecord(record) {
   budgetStore.add(record);
 }
 
+// getRecords returns the records stored in the BudgetStore object store
+function getRecords() {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(['BudgetStore'], 'readonly');
+    const budgetStore = transaction.objectStore('BudgetStore');
+
+    const getAll = budgetStore.getAll();
+    getAll.onsuccess = () => {
+      resolve(getAll.result);
+    };
+    getAll.onerror = () => {
+      reject('Error retrieving data from local IndexedDB.');
+    };
+  });
+}
+
 // listen for app coming back online
 window.addEventListener('online', checkDatabase);

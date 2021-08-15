@@ -1,17 +1,37 @@
 let transactions = [];
 let myChart;
 
+// Register service worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').then((reg) => {
+      console.log('We found your service worker file!', reg);
+    });
+  });
+}
+
+// Get data from remote database or cache first
 fetch('/api/transaction')
   .then((response) => {
     return response.json();
   })
   .then((data) => {
-    // save db data on global variable
-    transactions = data;
+    transactions.push(...data);
+    // Get data from IndexedDB
+    // If online, this will be empty
+    return getRecords();
+  })
+  .then((data) => {
+    // reverse is necessary here to keep last event first
+    transactions.unshift(...data.reverse());
+    // Render budget data using transactions
 
     populateTotal();
     populateTable();
     populateChart();
+  })
+  .catch((error) => {
+    console.log('Error fetching data: ' + error);
   });
 
 function populateTotal() {
