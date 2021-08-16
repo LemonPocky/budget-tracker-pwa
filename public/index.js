@@ -16,12 +16,18 @@ fetch('/api/transaction')
     return response.json();
   })
   .then((data) => {
+    if (!data) {
+      data = [];
+    }
     transactions.push(...data);
     // Get data from IndexedDB
     // If online, this will be empty
     return getRecords();
   })
   .then((data) => {
+    if (!data) {
+      data = [];
+    }
     // reverse is necessary here to keep last event first
     transactions.unshift(...data.reverse());
     // Render budget data using transactions
